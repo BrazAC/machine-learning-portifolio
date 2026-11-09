@@ -68,81 +68,35 @@ def sorvete():
 
 if __name__ == "__main__":
     # Foward pass em um neurônio
-    #y=tanh(x1w1+x2w2+b)
+    # y=tanh(x1w1+x2w2+b)
     x1 = Value(2, 'x1')
-    x2 = Value(3, 'x2')
-    w1 = Value(0.5, 'w1')
-    w2 = Value(0.2, 'w2')
-    b = Value(1, 'b')
+    x2 = Value(0, 'x2')
+    w1 = Value(-3, 'w1')
+    w2 = Value(1, 'w2')
+    b = Value(6.8813735870195432, 'b')
     x1w1 = x1*w1; x1w1.label = 'x1w1'
     x2w2 = x2*w2; x2w2.label = 'x2w2'
     k = x1w1 + x2w2; k.label = 'x1w1 + x2w2'
     j = k + b; j.label = 'x1w1 + x2w2 + b'
-    y = j.tanh(); y.label = 'y'
-    print(f"Antes: \t{y.data}")
+    l = 2*j; l.label='2x'
+    t = l.exp(); t.label = 'e'
+    e1 = t - 1; e1.label = 'e1'
+    e2 = t + 1; e2.label = 'e2'
+    y = e1 / e2; y.label = 'y'
+    #print(f"Antes: \t{y.data}")
 
+    y.backward()
     # Backpropagation manual
-    y.grad = 1
-    j.grad = 0.02182
-    b.grad = 0.02182
-    k.grad = 0.02182
-    x2w2.grad = 0.02182
-    x1w1.grad = 0.02182
-    w2.grad = 0.065454
-    x2.grad = 0.00436
-    w1.grad = 0.0436409
-    x1.grad = 0.010911
-
-    dot = draw_dot(y)
-    dot.render()
-
-    # Otimização
-    u = 0.01
-    w1.data = w1.data + u * w1.grad
-    w2.data = w2.data + u * w2.grad
-    b.data  = b.data + u *  b.grad
-
-    # Foward pass pós otimização
-    x1 = Value(2, 'x1')
-    x2 = Value(3, 'x2')
-    x1w1 = x1*w1; x1w1.label = 'x1w1'
-    x2w2 = x2*w2; x2w2.label = 'x2w2'
-    k = x1w1 + x2w2; k.label = 'x1w1 + x2w2'
-    j = k + b; j.label = 'x1w1 + x2w2 + b'
-    y = j.tanh(); y.label = 'y'
-    print(f"Depoi: \t{y.data}")
+    # y.grad = 1
+    # j.grad = 0.02182
+    # b.grad = 0.02182
+    # k.grad = 0.02182
+    # x2w2.grad = 0.02182
+    # x1w1.grad = 0.02182
+    # w2.grad = 0.065454
+    # x2.grad = 0.00436
+    # w1.grad = 0.0436409
+    # x1.grad = 0.010911
 
     dot1 = draw_dot(y)
     dot1.render()
-
-
-#     # Derivando uma função de múltiplas variáveis
-#     # f(a,b,c) = a+b*c+c
-#     a = Value(3, 'a')
-#     b = Value(4, 'b')
-#     c = Value(-2, 'c')
-#     d = b * c
-#     e = a + d
-#     y = e + c
-#
-#     #dy/dc = [f(a,b,c+h) - f(a,b,c)]/h
-#     h = 0.0001
-#
-#     a = Value(3+h, 'a')
-#     b = Value(4, 'b')
-#     c = Value(-2, 'c')
-#     d = b * c
-#     e = a + d
-#     fxh = e + c
-#     print(fxh)
-#
-#     a = Value(3, 'a')
-#     b = Value(4, 'b')
-#     c = Value(-2, 'c')
-#     d = b * c
-#     e = a + d
-#     fx = e + c
-#     print(fx)
-#
-#     grad  = (fxh.value-fx.value)/h
-#     print(f"dy/dc: {grad}")
