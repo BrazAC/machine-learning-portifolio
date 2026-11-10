@@ -11,7 +11,7 @@ class Value:
         self._backward = lambda: None
 
     def __repr__(self):
-        return f"<Value object: label {self.label} | value {self.data} | oper '{self._op}'>"
+        return f"<Value: {self.data}>"
 
     def __add__(self, other):
         if not isinstance(other, Value): other = Value(other, '')
@@ -72,6 +72,15 @@ class Value:
         o._backward = _backward
         return o
 
+    def relu(self):
+        n = self.data if self.data > 0 else 0
+        o = Value(n, '', "relu", (self,))
+        def _backward():
+            d = 1 if self.data > 0 else 0
+            self.grad = d * o.grad
+        o._backward = _backward
+        return o
+
     def backward(self):
         # Topological sort
         sorted = []
@@ -86,5 +95,4 @@ class Value:
         # All nodes _backward
         self.grad = 1
         for value in sorted:
-            print(value)
             value._backward()

@@ -1,4 +1,5 @@
-from micrograd import Value
+from engine import Value
+import nn
 from graphviz import Digraph
 
 def trace(root):
@@ -32,71 +33,42 @@ def draw_dot(root, format='svg', rankdir='LR'):
 
     return dot
 
-def sorvete():
-    h = 0.0001
-
-    #y=tanh(x1w1+x2w2+b)
-    x1 = Value(2 + h, 'x1')
-    x2 = Value(3, 'x2')
-    w1 = Value(0.5, 'w1')
-    w2 = Value(0.2, 'w2')
-    b = Value(1, 'b')
-    x1w1 = x1*w1; x1w1.label = 'x1w1'
-    x2w2 = x2*w2; x2w2.label = 'x2w2'
-    k = x1w1 + x2w2; k.label = 'x1w1 + x2w2'
-    j = k + b; j.label = 'x1w1 + x2w2 + b'
-    fxh = j.tanh(); y.label = 'y'
-    fxh = fxh.data
-
-    x1 = Value(2, 'x1')
-    x2 = Value(3, 'x2')
-    w1 = Value(0.5, 'w1')
-    w2 = Value(0.2, 'w2')
-    b = Value(1, 'b')
-    x1w1 = x1*w1; x1w1.label = 'x1w1'
-    x2w2 = x2*w2; x2w2.label = 'x2w2'
-    k = x1w1 + x2w2; k.label = 'x1w1 + x2w2'
-    j = k + b; j.label = 'x1w1 + x2w2 + b'
-    fx = j.tanh(); y.label = 'y'
-    fx = fx.data
-
-    deriv = (fxh - fx)/h
-    print(deriv)
-
-    dot = draw_dot(y)
-    dot.render()
-
 if __name__ == "__main__":
-    # Foward pass em um neurônio
-    # y=tanh(x1w1+x2w2+b)
-    x1 = Value(2, 'x1')
-    x2 = Value(0, 'x2')
-    w1 = Value(-3, 'w1')
-    w2 = Value(1, 'w2')
-    b = Value(6.8813735870195432, 'b')
-    x1w1 = x1*w1; x1w1.label = 'x1w1'
-    x2w2 = x2*w2; x2w2.label = 'x2w2'
-    k = x1w1 + x2w2; k.label = 'x1w1 + x2w2'
-    j = k + b; j.label = 'x1w1 + x2w2 + b'
-    l = 2*j; l.label='2x'
-    t = l.exp(); t.label = 'e'
-    e1 = t - 1; e1.label = 'e1'
-    e2 = t + 1; e2.label = 'e2'
-    y = e1 / e2; y.label = 'y'
-    #print(f"Antes: \t{y.data}")
+    # Mini dataset
+    x = [[-0.45,-1.0,0.0],
+        [1.3,2.9,0.3,1],
+        [0.6,-0.9,0.9]]
+    y_hat = [1.0, -1.0, 1.0]
 
-    y.backward()
-    # Backpropagation manual
-    # y.grad = 1
-    # j.grad = 0.02182
-    # b.grad = 0.02182
-    # k.grad = 0.02182
-    # x2w2.grad = 0.02182
-    # x1w1.grad = 0.02182
-    # w2.grad = 0.065454
-    # x2.grad = 0.00436
-    # w1.grad = 0.0436409
-    # x1.grad = 0.010911
+    # Instantiate model
+    mlp = nn.MLP(3, [5,5,1])
 
-    dot1 = draw_dot(y)
-    dot1.render()
+    # Training loop
+    y = []
+    epochs = 1000
+    for _ in range(epochs):
+        # Zero-grad
+        for par in mlp.parameters():
+            par.grad = 0
+
+        # Foward
+        y = [mlp(xs) for xs in x]
+
+        # Loss
+        L = sum([(y_p - y_h)**2 for y_p, y_h  in zip(y, y_hat)])/len(y_hat)
+        print(L.data)
+
+        # Backward
+        L.backward()
+
+        # Optimizer SGD
+        lr = 0.01
+        for par in mlp.parameters():
+            par.data -= lr * par.grad
+
+    print([value.data for value in y])
+    print(y_hat)
+
+
+    #dot1 = draw_dot(L)
+    #dot1.render()
