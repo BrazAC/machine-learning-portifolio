@@ -77,7 +77,7 @@ class Value:
         o = Value(n, '', "relu", (self,))
         def _backward():
             d = 1 if self.data > 0 else 0
-            self.grad = d * o.grad
+            self.grad += d * o.grad
         o._backward = _backward
         return o
 
