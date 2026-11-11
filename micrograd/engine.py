@@ -48,7 +48,7 @@ class Value:
         n = self.data ** other
         o = Value(n, '', f"**{other}", (self,))
         def _backward():
-            self.grad += other * math.pow(self.data, other - 1) * o.grad
+            self.grad += (other * math.pow(self.data, other - 1)) * o.grad
         o._backward = _backward
         return o
 
@@ -68,15 +68,15 @@ class Value:
         n = (math.exp(self.data) - math.exp(-self.data))/(math.exp(self.data) + math.exp(-self.data))
         o = Value(n, '', "tanh", (self,))
         def _backward():
-            self.grad += 1 - math.tanh(self.data)**2 * o.grad
+            self.grad += (1 - math.tanh(self.data)**2) * o.grad
         o._backward = _backward
         return o
 
     def relu(self):
-        n = self.data if self.data > 0 else 0
+        n = 0 if self.data < 0 else self.data
         o = Value(n, '', "relu", (self,))
         def _backward():
-            d = 1 if self.data > 0 else 0
+            d = 0 if o.data < 0 else 1
             self.grad += d * o.grad
         o._backward = _backward
         return o
