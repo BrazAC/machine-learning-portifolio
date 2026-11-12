@@ -17,4 +17,7 @@ Implementei a minha versão do projeto implementando mais funcionalidades:
 
 
 ## Principais conclusões
--
+- Precisamos zerar os gradientes entre épocas. Gradientes indicam como cada parâmetro influencia na previsão do modelo, no final de cada época temos novos parâmetros com novas influências. Não zerar o gradiente é manter as influências antigas e incorretas que afetarão o cálculo das novas influências visto que os gradientes são **acumulados** e não iniciados a cada nova época.
+- A justifica para acumularmos os gradientes é cobrir casos de cálculos de derivadas locais que envolvem usos múltiplos de uma mesma variável (regra da cadeia para cálculo multivariado). Além de permitir a execução de técnicas avançadas como gradient accumulation.
+- Como o método foward funciona usando a classe value gerando o grafo computacional e cadastrando o cálculo dos gradientes locais.
+- Como o método backwards funciona calculando os gradientes de forma "recursiva" usando o grafo computacional e o topological sort.
